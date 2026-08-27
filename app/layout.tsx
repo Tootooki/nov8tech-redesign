@@ -21,19 +21,19 @@ export async function generateMetadata(): Promise<Metadata> {
 
   return {
     metadataBase: new URL(origin),
-    title: "NOV8TECH — Pool Equipment & Everyday Tech",
+    title: "NOV8TECH — Pool Equipment",
     description: "A redesigned mobile-first storefront for NOV8TECH.",
     icons: { icon: "/favicon.svg", shortcut: "/favicon.svg" },
     openGraph: {
-      title: "NOV8TECH — Pool Equipment & Everyday Tech",
-      description: "Pool pumps, filters, salt systems and useful everyday tech.",
+      title: "NOV8TECH — Pool Equipment",
+      description: "Pool pumps, filters and salt systems, with legacy inventory kept separate.",
       images: [`${origin}/og.png`],
       type: "website",
     },
     twitter: {
       card: "summary_large_image",
-      title: "NOV8TECH — Pool Equipment & Everyday Tech",
-      description: "Pool pumps, filters, salt systems and useful everyday tech.",
+      title: "NOV8TECH — Pool Equipment",
+      description: "Pool pumps, filters and salt systems, with legacy inventory kept separate.",
       images: [`${origin}/og.png`],
     },
   };

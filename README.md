@@ -1,6 +1,6 @@
 # NOV8TECH storefront redesign
 
-A standalone, mobile-first redesign preview for [NOV8TECH](https://www.nov8tech.com/). It preserves verified product information and imagery from the current store while introducing a clearer responsive catalog, search and filtering, product-detail preview, cart interactions, trust messaging, and support content.
+A standalone, mobile-first redesign preview for [NOV8TECH](https://www.nov8tech.com/). It preserves verified product information and imagery from the current store while introducing a focused pool-equipment catalog, a separate Legacy Clearance collection for hubs and masks, responsive search, product-detail preview, cart interactions, trust messaging, and support content.
 
 This repository is an independent preview. It does not alter or connect checkout to the production Shopify store.
 

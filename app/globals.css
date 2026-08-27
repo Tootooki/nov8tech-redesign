@@ -125,6 +125,8 @@ button, input { font: inherit; }
 .productHeading p { margin: 12px 0 0; color: #5a7080; }
 .resultCount { color: #567080; font-size: 12px; font-weight: 900; letter-spacing: .1em; text-transform: uppercase; }
 .catalogToolbar { margin-bottom: 28px; padding: 12px; display: flex; align-items: center; justify-content: space-between; gap: 18px; background: white; border: 1px solid var(--line); }
+.catalogToolbarFocused { padding-left: 18px; }
+.catalogFocusNote { color: var(--blue); font-size: 12px; font-weight: 900; letter-spacing: .1em; text-transform: uppercase; }
 .filterChips { display: flex; flex-wrap: wrap; gap: 8px; }
 .filterChips button { min-height: 38px; padding: 9px 15px; border: 1px solid var(--line); border-radius: 999px; background: white; color: #486072; cursor: pointer; font-size: 13px; font-weight: 700; }
 .filterChips button.active { border-color: var(--ink); background: var(--ink); color: white; }
@@ -153,12 +155,24 @@ button, input { font: inherit; }
 .emptyState p { color: #5a7080; }
 .emptyState button { padding: 12px 18px; border: 0; background: var(--ink); color: white; font-weight: 800; }
 
-.openBoxSection { max-width: 1440px; min-height: 560px; margin: 0 auto; display: grid; grid-template-columns: .95fr 1.05fr; background: var(--ink); color: white; overflow: hidden; }
+.openBoxSection { max-width: 1440px; min-height: 560px; margin: 0 auto; display: grid; grid-template-columns: .8fr 1.2fr; background: var(--ink); color: white; overflow: hidden; }
 .openBoxCopy { padding: clamp(60px, 8vw, 120px); display: flex; flex-direction: column; justify-content: center; }
 .lightEyebrow { color: var(--aqua); }
 .openBoxCopy h2 { max-width: 540px; margin: 16px 0 18px; font-size: clamp(48px, 5.4vw, 74px); line-height: .98; letter-spacing: -.055em; }
 .openBoxCopy p { max-width: 500px; color: #b9cbd4; font-size: 17px; line-height: 1.65; }
 .openBoxCopy button { align-self: flex-start; min-height: 50px; margin-top: 20px; padding: 14px 20px; border: 0; background: var(--orange); color: white; font-weight: 900; cursor: pointer; }
+.legacyPolicy { max-width: 390px; margin-top: 24px; padding-top: 18px; border-top: 1px solid rgba(255,255,255,.2); color: var(--aqua); font-size: 11px; font-weight: 900; letter-spacing: .1em; line-height: 1.5; text-transform: uppercase; }
+.legacyGrid { padding: clamp(28px, 4vw, 54px); display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; align-content: center; background: linear-gradient(145deg, #0d3048, #071f33); }
+.legacyCard { min-width: 0; display: grid; grid-template-rows: auto 1fr; background: white; color: var(--ink); border: 1px solid rgba(255,255,255,.18); }
+.legacyImage { position: relative; width: 100%; aspect-ratio: 1.28; padding: 16px; border: 0; background: #f4f8f9; cursor: pointer; overflow: hidden; }
+.legacyImage img { width: 100%; height: 100%; object-fit: contain; mix-blend-mode: multiply; transition: transform .25s ease; }
+.legacyImage:hover img { transform: scale(1.04); }
+.legacyInfo { min-width: 0; padding: 14px; display: flex; flex-direction: column; }
+.legacyInfo > button { min-height: 56px; margin: 8px 0 12px; padding: 0; border: 0; background: transparent; color: var(--ink); text-align: left; font-size: 13px; font-weight: 800; line-height: 1.35; cursor: pointer; }
+.legacyPrice { margin-top: auto; display: flex; align-items: baseline; gap: 8px; }
+.legacyPrice b { font-size: 17px; }
+.legacyPrice del { color: #8798a3; font-size: 12px; }
+.legacyEmpty { grid-column: 1 / -1; padding: 60px 24px; border: 1px dashed rgba(255,255,255,.35); color: #c4d4dc; text-align: center; }
 .openBoxVisual { min-height: 560px; position: relative; padding: 60px; display: grid; place-items: center; background: radial-gradient(circle at 50% 48%, #2ebfca 0%, #0874a7 42%, #061b2e 73%); }
 .openBoxVisual::before { content: ""; position: absolute; inset: 44px; border: 1px solid rgba(255,255,255,.22); border-radius: 50%; }
 .openBoxVisual img { position: relative; z-index: 1; width: min(82%, 540px); max-height: 390px; object-fit: contain; mix-blend-mode: multiply; filter: drop-shadow(0 25px 30px rgba(0,0,0,.3)); }
@@ -249,6 +263,7 @@ button, input { font: inherit; }
   .addButton { font-size: 12px; }
   .openBoxSection { grid-template-columns: 1fr; }
   .openBoxCopy { padding: 70px 20px 40px; }
+  .legacyGrid { padding: 20px; }
   .openBoxVisual { min-height: 430px; padding: 35px; }
   .aboutSection { padding: 80px 20px; grid-template-columns: 1fr; gap: 30px; }
   .serviceStack { grid-column: auto; }
@@ -273,6 +288,10 @@ button, input { font: inherit; }
   .categoryCard strong { font-size: 20px; }
   .categoryCard small { font-size: 12px; }
   .openBoxCopy h2 { font-size: 48px; }
+  .legacyGrid { gap: 9px; }
+  .legacyImage { padding: 10px; aspect-ratio: 1.08; }
+  .legacyInfo { padding: 11px; }
+  .legacyInfo > button { min-height: 78px; font-size: 12px; }
   .siteFooter { grid-template-columns: 1fr 1fr; }
   .purchaseRow { grid-template-columns: 110px 1fr; }
 }

@@ -11,7 +11,7 @@ type Product = {
   price: number;
   compareAt?: number;
   image: string;
-  group: "Pool equipment" | "Tech accessories" | "Clearance";
+  group: "Pool equipment" | "Legacy clearance";
   badge?: string;
   available: boolean;
   stock?: number;
@@ -76,7 +76,7 @@ const products: Product[] = [
     price: 17.99,
     compareAt: 34.99,
     image: "https://www.nov8tech.com/cdn/shop/products/15-New7in2-ProductImage-SpaceGray.jpg?v=1668130959&width=900",
-    group: "Tech accessories",
+    group: "Legacy clearance",
     badge: "Sale",
     available: true,
   },
@@ -86,7 +86,7 @@ const products: Product[] = [
     title: "Dolce Calma KN95 Face Mask | 60 Pack Individually Wrapped | Multicolor",
     price: 29.49,
     image: "https://www.nov8tech.com/cdn/shop/products/71m8j7d7V2L.jpg?v=1642679825&width=900",
-    group: "Clearance",
+    group: "Legacy clearance",
     available: true,
   },
   {
@@ -96,7 +96,7 @@ const products: Product[] = [
     price: 17.99,
     compareAt: 34.99,
     image: "https://www.nov8tech.com/cdn/shop/products/15-New7in2-ProductImage-Silver.jpg?v=1693547701&width=900",
-    group: "Tech accessories",
+    group: "Legacy clearance",
     badge: "Sale",
     available: true,
   },
@@ -107,7 +107,7 @@ const products: Product[] = [
     price: 37.99,
     compareAt: 49.99,
     image: "https://www.nov8tech.com/cdn/shop/products/7in2Old-LifeStyle03-Small-Gold.jpg?v=1663653102&width=900",
-    group: "Clearance",
+    group: "Legacy clearance",
     badge: "Sold out",
     available: false,
   },
@@ -117,8 +117,11 @@ const categoryCards = [
   { title: "Pool pumps", detail: "Variable-speed and single-speed pumps", filter: "Pool equipment", number: "01" },
   { title: "Filters", detail: "Cartridge filters and replacement systems", filter: "Pool equipment", number: "02" },
   { title: "Salt systems", detail: "Cells and water treatment", filter: "Pool equipment", number: "03" },
-  { title: "Open box", detail: "Pool equipment at clearance pricing", filter: "Clearance", number: "04" },
+  { title: "Legacy clearance", detail: "Hubs and masks kept separate from the pool catalog", filter: "Legacy clearance", number: "04" },
 ];
+
+const coreProducts = products.filter((product) => product.group === "Pool equipment");
+const legacyProducts = products.filter((product) => product.group === "Legacy clearance");
 
 const money = (value: number) =>
   new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(value);
@@ -128,28 +131,38 @@ export default function Storefront() {
   const [cartOpen, setCartOpen] = useState(false);
   const [cartCount, setCartCount] = useState(0);
   const [query, setQuery] = useState("");
-  const [filter, setFilter] = useState("All");
   const [sort, setSort] = useState("featured");
   const [selected, setSelected] = useState<Product | null>(null);
   const [quantity, setQuantity] = useState(1);
 
   const visibleProducts = useMemo(() => {
     const normalized = query.trim().toLowerCase();
-    const result = products.filter((product) => {
-      const matchesFilter = filter === "All" || product.group === filter;
+    const result = coreProducts.filter((product) => {
       const matchesQuery = !normalized || `${product.vendor} ${product.title} ${product.id}`.toLowerCase().includes(normalized);
-      return matchesFilter && matchesQuery;
+      return matchesQuery;
     });
     return [...result].sort((a, b) => {
       if (sort === "low") return a.price - b.price;
       if (sort === "high") return b.price - a.price;
       return 0;
     });
-  }, [filter, query, sort]);
+  }, [query, sort]);
 
-  const jumpToCatalog = (nextFilter = "All") => {
-    setFilter(nextFilter);
-    document.getElementById("catalog")?.scrollIntoView({ behavior: "smooth" });
+  const visibleLegacyProducts = useMemo(() => {
+    const normalized = query.trim().toLowerCase();
+    return legacyProducts.filter((product) =>
+      !normalized || `${product.vendor} ${product.title} ${product.id}`.toLowerCase().includes(normalized),
+    );
+  }, [query]);
+
+  const jumpToCatalog = (destination = "Pool equipment") => {
+    const sectionId = destination === "Legacy clearance" ? "legacy-clearance" : "catalog";
+    document.getElementById(sectionId)?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  const jumpToSearchResults = () => {
+    const legacyOnlyMatch = query.trim() && visibleProducts.length === 0 && visibleLegacyProducts.length > 0;
+    jumpToCatalog(legacyOnlyMatch ? "Legacy clearance" : "Pool equipment");
   };
 
   const addToCart = (amount = 1) => {
@@ -174,10 +187,9 @@ export default function Storefront() {
           <img src="https://www.nov8tech.com/cdn/shop/files/Logo_250x@2x.png?v=1747169481" alt="NOV8TECH" />
         </button>
         <nav className="desktopNav" aria-label="Main navigation">
-          <button onClick={() => jumpToCatalog("All")}>Shop</button>
+          <button onClick={() => jumpToCatalog()}>Shop</button>
           <button onClick={() => jumpToCatalog("Pool equipment")}>Pool equipment</button>
-          <button onClick={() => document.getElementById("open-box")?.scrollIntoView({ behavior: "smooth" })}>Open box</button>
-          <button onClick={() => jumpToCatalog("Clearance")}>Clearance</button>
+          <button onClick={() => jumpToCatalog("Legacy clearance")}>Legacy clearance</button>
           <button onClick={() => document.getElementById("about")?.scrollIntoView({ behavior: "smooth" })}>About</button>
         </nav>
         <div className="headerActions">
@@ -186,19 +198,19 @@ export default function Storefront() {
         </div>
         <label className="searchBar">
           <span>Search</span>
-          <input id="store-search" value={query} onChange={(event) => setQuery(event.target.value)} onFocus={() => jumpToCatalog(filter)} placeholder="Search products, brands or part numbers" />
-          <button type="button" aria-label="Submit search" onClick={() => jumpToCatalog(filter)}>⌕</button>
+          <input id="store-search" value={query} onChange={(event) => setQuery(event.target.value)} onKeyDown={(event) => { if (event.key === "Enter") jumpToSearchResults(); }} placeholder="Search products, brands or part numbers" />
+          <button type="button" aria-label="Submit search" onClick={jumpToSearchResults}>⌕</button>
         </label>
       </header>
 
       <section className="hero">
         <div className="heroCopy">
-          <span className="eyebrow">NOV8TECH / POOL & EVERYDAY TECH</span>
+          <span className="eyebrow">NOV8TECH / POOL EQUIPMENT</span>
           <h1>Find the right equipment. Get back to the water.</h1>
-          <p>Pool pumps, filters, salt systems and useful everyday tech—organized for quick, confident shopping.</p>
+          <p>Pool pumps, filters, salt systems and replacement equipment—organized for quick, confident shopping.</p>
           <div className="heroActions">
             <button className="primaryButton" onClick={() => jumpToCatalog("Pool equipment")}>Shop pool equipment</button>
-            <button className="secondaryButton" onClick={() => jumpToCatalog("Clearance")}>Browse clearance</button>
+            <button className="secondaryButton" onClick={() => jumpToCatalog("Legacy clearance")}>Browse legacy clearance</button>
           </div>
           <div className="heroMeta">
             <span><b>12</b> in stock</span>
@@ -222,7 +234,7 @@ export default function Storefront() {
       <section className="sectionShell" id="categories">
         <div className="sectionHeading">
           <div><span className="eyebrow">SHOP BY CATEGORY</span><h2>Start with what you need</h2></div>
-          <button className="textLink" onClick={() => jumpToCatalog("All")}>View all products →</button>
+          <button className="textLink" onClick={() => jumpToCatalog()}>View pool equipment →</button>
         </div>
         <div className="categoryGrid">
           {categoryCards.map((category) => (
@@ -238,15 +250,11 @@ export default function Storefront() {
       <section className="productSection" id="catalog">
         <div className="sectionShell productSectionInner">
           <div className="sectionHeading productHeading">
-            <div><span className="eyebrow">CURRENT CATALOG</span><h2>Popular products</h2><p>Verified products, pricing and availability from NOV8TECH.</p></div>
+            <div><span className="eyebrow">CORE STOREFRONT</span><h2>Pool equipment</h2><p>The primary catalog now stays focused on pumps, filters and pool systems.</p></div>
             <span className="resultCount">{visibleProducts.length} {visibleProducts.length === 1 ? "product" : "products"}</span>
           </div>
-          <div className="catalogToolbar">
-            <div className="filterChips" aria-label="Product filters">
-              {["All", "Pool equipment", "Tech accessories", "Clearance"].map((item) => (
-                <button key={item} className={filter === item ? "active" : ""} onClick={() => setFilter(item)}>{item}</button>
-              ))}
-            </div>
+          <div className="catalogToolbar catalogToolbarFocused">
+            <span className="catalogFocusNote">Pool equipment only</span>
             <label className="sortControl">Sort
               <select value={sort} onChange={(event) => setSort(event.target.value)}>
                 <option value="featured">Featured</option>
@@ -274,22 +282,32 @@ export default function Storefront() {
               ))}
             </div>
           ) : (
-            <div className="emptyState"><h3>No matching products</h3><p>Try another product name, brand or part number.</p><button onClick={() => { setQuery(""); setFilter("All"); }}>Clear filters</button></div>
+            <div className="emptyState"><h3>No matching pool products</h3><p>Try another product name, brand or part number.</p><button onClick={() => setQuery("")}>Clear search</button></div>
           )}
         </div>
       </section>
 
-      <section className="openBoxSection" id="open-box">
+      <section className="openBoxSection legacySection" id="legacy-clearance">
         <div className="openBoxCopy">
-          <span className="eyebrow lightEyebrow">OPEN BOX & CLEARANCE</span>
-          <h2>Useful tech. Cleaner pricing.</h2>
-          <p>Browse existing NOV8TECH USB-C hubs, accessories and clearance products in one focused collection.</p>
-          <button onClick={() => jumpToCatalog("Tech accessories")}>Shop tech accessories</button>
+          <span className="eyebrow lightEyebrow">SEPARATE FROM THE MAIN CATALOG</span>
+          <h2>Legacy clearance.</h2>
+          <p>USB-C hubs and masks remain available for now, but no longer compete with pool equipment in the primary shopping journey.</p>
+          <span className="legacyPolicy">Limited legacy inventory / while supplies last</span>
         </div>
-        <div className="openBoxVisual">
-          <span>7 devices / 1 compact hub</span>
-          <img src={products[4].image} alt={products[4].title} loading="lazy" />
-          <div><del>$34.99</del><b>$17.99</b></div>
+        <div className="legacyGrid" aria-label="Legacy clearance products">
+          {visibleLegacyProducts.length ? visibleLegacyProducts.map((product) => (
+            <article className="legacyCard" key={product.id}>
+              <button className="legacyImage" onClick={() => { setSelected(product); setQuantity(1); }} aria-label={`View ${product.title}`}>
+                {product.badge && <span className={`badge ${product.available ? "" : "sold"}`}>{product.badge}</span>}
+                <img src={product.image} alt={product.title} loading="lazy" />
+              </button>
+              <div className="legacyInfo">
+                <span className="vendor">{product.vendor} / {product.id}</span>
+                <button onClick={() => { setSelected(product); setQuantity(1); }}>{product.title}</button>
+                <div className="legacyPrice"><b>{money(product.price)}</b>{product.compareAt && <del>{money(product.compareAt)}</del>}</div>
+              </div>
+            </article>
+          )) : <div className="legacyEmpty">No legacy items match this search.</div>}
         </div>
       </section>
 
@@ -298,7 +316,7 @@ export default function Storefront() {
         <div className="aboutCopy">
           <h2>Where innovation meets everyday life.</h2>
           <p>Nov8Tech is headquartered in Scottsdale, Arizona. The company has been selling tech products since 2015.</p>
-          <p>We offer an expanding line-up of electronic products and pool equipment, backed by customer service via phone, email and online chat.</p>
+          <p>We offer pool equipment alongside a separate legacy selection of electronic products, backed by customer service via phone, email and online chat.</p>
           <a href="mailto:info@nov8tech.com">info@nov8tech.com →</a>
         </div>
         <div className="serviceStack" id="support">
@@ -311,9 +329,9 @@ export default function Storefront() {
       <footer className="siteFooter">
         <div className="footerBrand">
           <img src="https://www.nov8tech.com/cdn/shop/files/Logo_250x@2x.png?v=1747169481" alt="NOV8TECH" />
-          <p>Pool equipment and everyday tech, organized for easier shopping.</p>
+          <p>Pool equipment first, with legacy inventory kept separate and easy to find.</p>
         </div>
-        <div><h3>Shop</h3><button onClick={() => jumpToCatalog("Pool equipment")}>Pool pumps & filters</button><button onClick={() => jumpToCatalog("Clearance")}>Clearance sale</button><button onClick={() => document.getElementById("open-box")?.scrollIntoView({ behavior: "smooth" })}>Open box</button></div>
+        <div><h3>Shop</h3><button onClick={() => jumpToCatalog("Pool equipment")}>Pool pumps & filters</button><button onClick={() => jumpToCatalog("Legacy clearance")}>Legacy clearance</button></div>
         <div><h3>Help</h3><span>Search</span><span>Cart</span><span>Account</span><a href="mailto:info@nov8tech.com">Contact</a></div>
         <div><h3>Store benefits</h3><span>Free shipping over $40</span><span>30-day returns</span><span>Online support</span><span>Flexible payments</span></div>
         <div className="footerBottom"><span>© 2026 Nov8Tech.com. All rights reserved.</span><span>Independent redesign preview — production unchanged.</span></div>
@@ -322,14 +340,14 @@ export default function Storefront() {
       <nav className="bottomNav" aria-label="Mobile navigation">
         <button onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}><b>⌂</b><span>Home</span></button>
         <button onClick={() => document.getElementById("store-search")?.focus()}><b>⌕</b><span>Search</span></button>
-        <button onClick={() => jumpToCatalog("All")}><b>▦</b><span>Shop</span></button>
+        <button onClick={() => jumpToCatalog()}><b>▦</b><span>Shop</span></button>
         <button onClick={() => setCartOpen(true)}><b>Bag</b><span>Cart ({cartCount})</span></button>
       </nav>
 
       {menuOpen && <button className="drawerBackdrop" aria-label="Close menu" onClick={() => setMenuOpen(false)} />}
       <aside className={`sideDrawer menuDrawer ${menuOpen ? "open" : ""}`} aria-hidden={!menuOpen}>
         <div className="drawerHeader"><img src="https://www.nov8tech.com/cdn/shop/files/Logo_250x@2x.png?v=1747169481" alt="NOV8TECH" /><button aria-label="Close menu" onClick={() => setMenuOpen(false)}>×</button></div>
-        {["All", "Pool equipment", "Tech accessories", "Clearance"].map((item) => <button key={item} onClick={() => { setMenuOpen(false); jumpToCatalog(item); }}>{item === "All" ? "Shop all" : item}<span>→</span></button>)}
+        {["Pool equipment", "Legacy clearance"].map((item) => <button key={item} onClick={() => { setMenuOpen(false); jumpToCatalog(item); }}>{item}<span>→</span></button>)}
         <button onClick={() => { setMenuOpen(false); document.getElementById("about")?.scrollIntoView({ behavior: "smooth" }); }}>About NOV8TECH<span>→</span></button>
         <div className="drawerNote"><b>Free shipping</b><span>Orders over $40</span></div>
       </aside>
@@ -341,7 +359,7 @@ export default function Storefront() {
           <span className="cartCountBig">{cartCount}</span>
           <h2>{cartCount ? "Items added to your preview cart" : "Your cart is empty"}</h2>
           <p>This redesign preview demonstrates the shopping flow without connecting to the production checkout.</p>
-          <button className="primaryButton" onClick={() => { setCartOpen(false); jumpToCatalog("All"); }}>Continue shopping</button>
+          <button className="primaryButton" onClick={() => { setCartOpen(false); jumpToCatalog(); }}>Continue shopping</button>
         </div>
       </aside>
 
