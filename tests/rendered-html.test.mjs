@@ -33,6 +33,8 @@ test("includes responsive navigation and catalog controls", async () => {
 
   assert.match(html, /aria-label="Mobile navigation"/);
   assert.match(html, /id="store-search"/);
+  assert.equal((html.match(/data-icon="basket"/g) ?? []).length, 2);
+  assert.doesNotMatch(html, />Bag</);
   assert.match(html, /Shop pool equipment/);
   assert.match(html, /Legacy clearance/);
   assert.match(html, /info@nov8tech\.com/);

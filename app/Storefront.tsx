@@ -126,6 +126,16 @@ const legacyProducts = products.filter((product) => product.group === "Legacy cl
 const money = (value: number) =>
   new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(value);
 
+function BasketIcon() {
+  return (
+    <svg className="basketIcon" data-icon="basket" viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M4.5 9.5h15l-1.3 9H5.8l-1.3-9Z" />
+      <path d="M8 9.5c0-2.2 1.8-4 4-4s4 1.8 4 4" />
+      <path d="M8.5 13v2.2M12 13v2.2M15.5 13v2.2" />
+    </svg>
+  );
+}
+
 export default function Storefront() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
@@ -194,7 +204,7 @@ export default function Storefront() {
         </nav>
         <div className="headerActions">
           <button className="iconButton" aria-label="Focus search" onClick={() => document.getElementById("store-search")?.focus()}>⌕</button>
-          <button className="cartButton" aria-label={`Cart with ${cartCount} items`} onClick={() => setCartOpen(true)}>Bag <b>{cartCount}</b></button>
+          <button className="cartButton" aria-label={`Cart with ${cartCount} items`} onClick={() => setCartOpen(true)}><BasketIcon /><b>{cartCount}</b></button>
         </div>
         <label className="searchBar">
           <span>Search</span>
@@ -341,7 +351,7 @@ export default function Storefront() {
         <button onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}><b>⌂</b><span>Home</span></button>
         <button onClick={() => document.getElementById("store-search")?.focus()}><b>⌕</b><span>Search</span></button>
         <button onClick={() => jumpToCatalog()}><b>▦</b><span>Shop</span></button>
-        <button onClick={() => setCartOpen(true)}><b>Bag</b><span>Cart ({cartCount})</span></button>
+        <button onClick={() => setCartOpen(true)}><b className="bottomNavIcon"><BasketIcon /></b><span>Cart ({cartCount})</span></button>
       </nav>
 
       {menuOpen && <button className="drawerBackdrop" aria-label="Close menu" onClick={() => setMenuOpen(false)} />}
